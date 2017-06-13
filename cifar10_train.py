@@ -47,14 +47,15 @@ import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
-from tensorflow.models.image.cifar10 import cifar10
+#from tensorflow.models.image.cifar10 import cifar10
+import cifar10
 
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('train_dir', '/tmp/cifar10_train',
+tf.app.flags.DEFINE_string('train_dir', 'cifar10_trian/',
                            """Directory where to write event logs """
                            """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 1000000,
+tf.app.flags.DEFINE_integer('max_steps', 20000,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
@@ -80,24 +81,32 @@ def train():
     train_op = cifar10.train(loss, global_step)
 
     # Create a saver.
-    saver = tf.train.Saver(tf.all_variables())
+    saver = tf.train.Saver(tf.global_variables())
 
     # Build the summary operation based on the TF collection of Summaries.
-    summary_op = tf.merge_all_summaries()
-
-    # Build an initialization operation to run below.
-    init = tf.initialize_all_variables()
+    summary_op = tf.summary.merge_all()
 
     # Start running operations on the Graph.
     sess = tf.Session(config=tf.ConfigProto(
         log_device_placement=FLAGS.log_device_placement))
+
+    # Build an initialization operation to run below.
+    init = tf.global_variables_initializer()
     sess.run(init)
+
+    ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
+    if ckpt and ckpt.model_checkpoint_path:
+      # Restores from checkpoint
+      saver.restore(sess, ckpt.model_checkpoint_path)
+      print ("restore from file")
+    else:
+      print('No checkpoint file found')
 
     # Start the queue runners.
     tf.train.start_queue_runners(sess=sess)
 
-    summary_writer = tf.train.SummaryWriter(FLAGS.train_dir,
-                                            graph_def=sess.graph_def)
+    summary_writer = tf.summary.FileWriter(FLAGS.train_dir,
+                                            graph=sess.graph)
 
     for step in xrange(FLAGS.max_steps):
       start_time = time.time()
@@ -129,10 +138,13 @@ def train():
 def main(argv=None):  # pylint: disable=unused-argument
   cifar10.maybe_download_and_extract()
   if gfile.Exists(FLAGS.train_dir):
-    gfile.DeleteRecursively(FLAGS.train_dir)
-  gfile.MakeDirs(FLAGS.train_dir)
+    # gfile.DeleteRecursively(FLAGS.train_dir)
+    pass
+  else:
+    gfile.MakeDirs(FLAGS.train_dir)
   train()
 
 
 if __name__ == '__main__':
   tf.app.run()
+

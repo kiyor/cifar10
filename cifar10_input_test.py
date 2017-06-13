@@ -25,8 +25,11 @@ import tensorflow.python.platform
 
 import tensorflow as tf
 
-from tensorflow.models.image.cifar10 import cifar10_input
+#from tensorflow.models.image.cifar10 import cifar10_input
+#from tensorflow.python.util import compat
+import compat as cp
 
+import cifar10_input
 
 class CIFAR10InputTest(tf.test.TestCase):
 
@@ -56,7 +59,7 @@ class CIFAR10InputTest(tf.test.TestCase):
       for i in range(3):
         key, label, uint8image = sess.run([
             result.key, result.label, result.uint8image])
-        self.assertEqual("%s:%d" % (filename, i), tf.compat.as_text(key))
+        self.assertEqual("%s:%d" % (filename, i), cp.as_text(key))
         self.assertEqual(labels[i], label)
         self.assertAllEqual(expected[i], uint8image)
 

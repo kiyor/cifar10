@@ -1,10 +1,7 @@
-CIFAR-10 is a common benchmark in machine learning for image recognition.
+## tensorflow cifar10
 
-http://www.cs.toronto.edu/~kriz/cifar.html
+Original code from `https://tensorflow.googlesource.com/tensorflow/+/master/tensorflow/models/image/cifar10/`
 
-Code in this directory demonstrates how to use TensorFlow to train and evaluate a convolutional neural network (CNN) on both CPU and GPU. We also demonstrate how to train a CNN over multiple GPUs.
+Since not working on tensorflow r1.2, code has been modified.
 
-Detailed instructions on how to get started available at:
-
-http://tensorflow.org/tutorials/deep_cnn/
-
+Some of the code are from `https://github.com/xiang2017/cifar10`
